@@ -13,4 +13,6 @@ struct program
 struct program* load_program(const char *path);
 void deallocate_program(struct program **prog);
 
+int find_matching_brace(const struct program *p, int at);
+
 #endif /* __BFI_LOAD_H_ */

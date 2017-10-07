@@ -11,7 +11,7 @@ struct state
     int iptr;
     uint8_t *mem;
     int size;
-    struct program *program;
+    const struct program *program;
 };
 
 void dealloc_state(struct state **state)
@@ -34,6 +34,7 @@ struct state* alloc_state(int size)
 
 void resize_memory(struct state *state, int nsize)
 {
+    printf("[Resizing memory to %d bytes]\n", nsize);
     state->size = nsize;
     state->mem = (uint8_t*)realloc(state->mem, nsize);
 }
@@ -41,8 +42,52 @@ void resize_memory(struct state *state, int nsize)
 
 void execute(struct state *state)
 {
-    while (state->iptr != (int)state->size) {
+    while (state->iptr != (int)state->program->len) {
+        uint8_t instr = state->program->src[state->iptr];
+        printf("[instr %c]\n", instr);
 
+        switch (instr) {
+            case '<': {
+                state->mptr--;
+                if (state->mptr < 0)
+                    state->mptr = 0;
+            } break;
+
+            case '>': {
+                state->mptr++;
+                if (state->mptr >= state->size) {
+                    resize_memory(state, state->size + 128);
+                }
+            } break;
+
+            case '+': {
+                state->mem[state->mptr]++;
+            } break;
+
+            case '-': {
+                state->mem[state->mptr]--;
+            } break;
+
+            case '[': {
+                if (!state->mem[state->mptr])
+                    state->iptr = find_matching_brace(state->program, state->iptr);
+            } break;
+
+            case ']': {
+                if (!state->mem[state->mptr])
+                    state->iptr = find_matching_brace(state->program, state->iptr);
+            } break;
+
+            case ',': {
+                state->mem[state->mptr] = getchar();
+            } break;
+
+            case '.': {
+                printf("%c", state->mem[state->mptr]);
+            } break;
+        }
+
+        state->iptr++;
     }
 }
 
@@ -72,6 +117,9 @@ int main(int argc, char **argv)
     state->program = prog;
 
     execute(state);
+
+    deallocate_program(&prog);
+    dealloc_state(&state);
 
     return 0;
 }

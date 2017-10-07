@@ -85,3 +85,43 @@ void deallocate_program(struct program **prog)
     *prog = NULL;
 }
 
+int find_matching_brace(const struct program *p, int at)
+{
+    if (at >= p->len)
+        return -1;
+    if (p->src[at] != '[' && p->src[at] != ']')
+        return -1;
+
+    if (p->src[at] == '[') {
+        int stack = 1;
+
+        for (int i=at+1; i<p->len; i++) {
+            if (p->src[i] == '[')
+                stack++;
+            if (p->src[i] == ']')
+                stack--;
+
+            if (stack == 0)
+                return i;
+        }
+
+        return -1;
+    } else {
+        int stack = 1;
+
+        for (int i=at-1; i>=0; i--) {
+            if (p->src[i] == '[')
+                stack--;
+            if (p->src[i] == ']')
+                stack++;
+
+            if (stack == 0)
+                return i;
+        }
+
+        return -1;
+    }
+
+    return -1;
+}
+
