@@ -1,0 +1,10 @@
+*.creator
+*.creator.user
+*.files
+*.includes
+*.config
+obj/
+bfi
+
+.ycm*
+.vscode
