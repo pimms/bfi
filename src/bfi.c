@@ -84,5 +84,6 @@ int main(int argc, char **argv)
     execute(state);
 
     deallocate_program(prog);
+    dealloc_state(state);
     return 0;
 }
