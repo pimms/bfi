@@ -57,7 +57,6 @@ struct program* load_program(const char *path)
                 if (read >= allocated) {
                     prog->len += 128;
                     allocated = prog->len;
-                    printf("Reallocating to %zd bytes\n", prog->len);
                     prog->src = (uint8_t*)realloc(prog->src, prog->len);
                 }
 
@@ -71,18 +70,17 @@ struct program* load_program(const char *path)
     prog->len = read;
 
     if (!validate(prog)) {
-        deallocate_program(&prog);
+        deallocate_program(prog);
         return NULL;
     }
 
     return prog;
 }
 
-void deallocate_program(struct program **prog)
+void deallocate_program(struct program *prog)
 {
-    free((*prog)->src);
-    free(*prog);
-    *prog = NULL;
+    free(prog->src);
+    free(prog);
 }
 
 int find_matching_brace(const struct program *p, int at)
